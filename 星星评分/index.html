@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Container">
+        <img src="./images/empty.png" alt="">
+        <img src="./images/empty.png" alt="">
+        <img src="./images/empty.png" alt="">
+        <img src="./images/empty.png" alt="">
+        <img src="./images/empty.png" alt="">
+    </div>
+    <span></span>
+    <script>
+        (function () {
+            const Container = document.querySelector(".Container")
+            const span = document.querySelector("span")
+            let currentIndex = -1
+            Container.onmouseover = function (e) {
+                if (e.target.nodeName === "IMG") {
+                    const index = [...Container.children].findIndex(img => img === e.target)
+                    span.innerText = `${index + 1}星`
+                    for (let i = 0; i < Container.children.length; i++) {
+                        if (i <= index) {
+                            Container.children[i].src = "./images/xingxing.png"
+                        } else {
+                            Container.children[i].src = "./images/empty.png"
+                        }
+                    }
+                }
+            }
+            Container.onclick = function (e) {
+                if (e.target.nodeName === "IMG") {
+                    const index = [...Container.children].findIndex(img => img === e.target)
+                    span.innerText = `${index + 1}星`
+                    currentIndex = index
+                }
+            }
+            Container.onmouseleave = function (e) {
+                span.innerText = `${currentIndex + 1}星`
+                for (let i = 0; i < Container.children.length; i++) {
+                    if (i <= currentIndex) {
+                        Container.children[i].src = "./images/xingxing.png"
+                    } else {
+                        Container.children[i].src = "./images/empty.png"
+                    }
+                }
+            }
+        })()
+    </script>
+</body>
+
+</html>

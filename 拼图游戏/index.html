@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拼图游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .Container {
+            width: 500px;
+            height: 500px;
+            border: 2px solid;
+            margin: 100px auto;
+            position: relative;
+        }
+        img{
+            width: 200px;
+            position: absolute;
+            right: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Container">
+        <img src="./1.png" alt="">
+    </div>
+    
+    <script>
+        const config = {
+            container: document.querySelector(".Container"),
+            hang: 3,
+            lie: 3,
+            isOver: false
+        }
+        config.width = config.container.clientWidth
+        config.height = config.container.clientHeight
+        config.boxWidth = config.width / config.lie
+        config.boxHeight = config.height / config.hang
+        config.allBox = []
+        class Box {
+            constructor(left, top, isLook) {
+                this.left = left
+                this.top = top
+                this.trueLeft = left
+                this.trueTop = top
+                this.isLook = isLook
+                this.dom = document.createElement("div")
+                this.dom.style.width = config.boxWidth + 'px'
+                this.dom.style.height = config.boxHeight + 'px'
+                this.dom.style.position = "absolute"
+                this.dom.style.border = "1px solid #fff"
+                this.dom.style.backgroundImage = `url(./1.png)`
+                this.dom.style.backgroundRepeat = 'no-repeat'
+                this.dom.style.backgroundSize = `${config.width}px ${config.height}px`
+                this.dom.style.backgroundPosition = `-${this.left}px -${this.top}px`
+                if (!isLook) {
+                    this.dom.style.display = "none"
+                }
+                this.show()
+                config.container.appendChild(this.dom)
+            }
+            show() {
+                this.dom.style.left = this.left + 'px'
+                this.dom.style.top = this.top + 'px'
+            }
+            isTrue() {
+                return isEqual(this.left, this.trueLeft) && isEqual(this.top, this.trueTop)
+            }
+        }
+        // 生成格子
+        function createBox() {
+            for (let i = 0; i < config.hang; i++) {
+                for (let j = 0; j < config.lie; j++) {
+                    const left = j * config.boxWidth
+                    const top = i * config.boxHeight
+                    let isLook = true
+                    if (i === config.hang - 1 && j == config.lie - 1) {
+                        isLook = false
+                    }
+                    const box = new Box(left, top, isLook)
+                    config.allBox.push(box)
+                }
+            }
+        }
+        // 是否再正确位置
+        function isEqual(num1, num2) {
+            return parseInt(num1) === parseInt(num2)
+        }
+        // 交换位置
+        function jiaohuan(box1, box2) {
+            let temp = box1.left
+            box1.left = box2.left
+            box2.left = temp
+            temp = box1.top
+            box1.top = box2.top
+            box2.top = temp
+            box1.show()
+            box2.show()
+        }
+        // 打乱位置
+        function daluan() {
+            function getRandom(min, max) {
+                return Math.floor(Math.random() * (max + min - 1) + min)
+            }
+            for (let i = 0; i < config.allBox.length - 1; i++) {
+                const index = getRandom(0, config.allBox.length - 2)
+                jiaohuan(config.allBox[i], config.allBox[index])
+            }
+        }
+        // 判断是否胜利
+        function isWin() {
+            /* const a = config.allBox.filter(box=>{
+                return !box.isTrue()
+            }) */
+            for (let i = 0; i < config.allBox.length; i++) {
+                if (!config.allBox[i].isTrue()) {
+                    return false
+                }
+            }
+            config.isOver = true
+            for (let i = 0; i < config.allBox.length; i++) {
+                config.allBox[i].dom.style.border = "none"
+                config.allBox[i].dom.style.display = "block"
+            }
+        }
+        // 点击事件
+        function initEvent() {
+            // 找到空白位置的dom盒子
+            const kongbaiBox = config.allBox.find(box => !box.isLook)
+            for (let i = 0; i < config.allBox.length; i++) {
+                const box = config.allBox[i];
+                box.dom.addEventListener("click", function (e) {
+                    if (config.isOver) {
+                        return
+                    }
+                    if (isEqual(box.top, kongbaiBox.top) && isEqual(Math.abs(box.left - kongbaiBox.left), config.boxWidth) || isEqual(box.left, kongbaiBox.left) && isEqual(Math.abs(box.top - kongbaiBox.top), config.boxHeight)) {
+                        jiaohuan(box, kongbaiBox)
+                        isWin()
+                    }
+                })
+            }
+        }
+        function init() {
+            createBox()
+            daluan()
+            initEvent()
+        }
+        init()
+    </script>
+</body>
+
+</html>

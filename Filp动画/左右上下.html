@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .Container {
+            list-style: none;
+            position: relative;
+        }
+
+        .Container li {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            line-height: 50px;
+            text-align: center;
+        }
+
+        .Container li:nth-child(1) {
+            left: 500px;
+            top: 500px;
+        }
+
+        .Container li:nth-child(2) {
+            left: 140px;
+            top: 100px;
+        }
+
+        .Container li:nth-child(3) {
+            left: 100px;
+            top: 20px;
+        }
+
+        .Container li:nth-child(4) {
+            left: 60px;
+            top: 400px;
+        }
+
+        .Container li:nth-child(5) {
+            left: 250px;
+            top: 250px;
+        }
+
+        .Container li:nth-child(6) {
+            left: 450px;
+            top: 450px;
+        }
+    </style>
+</head>
+
+<body>
+    <ul class="Container">
+        <li style="background-color: rgb(66, 156, 235);">1</li>
+        <li style="background-color: aqua;">2</li>
+        <li style="background-color: blueviolet;">3</li>
+        <li style="background-color: brown;">4</li>
+        <li style="background-color: yellowgreen;">5</li>
+        <li style="background-color: rgb(160, 223, 36);">6</li>
+    </ul>
+    <button>Filp</button>
+    <script>
+        (function () {
+            const Container = document.querySelector(".Container")
+            const lis = document.querySelectorAll(".Container li")
+            const btn = document.querySelector("button")
+            let filp = null
+            let i = 0
+            class Filp {
+                constructor(children) {
+                    this.children = children
+                    this.arr = this.getstyle(this.children)
+                }
+                getstyle(doms) {
+                    const array = []
+                    for (let i = 0; i < doms.length; i++) {
+                        const dom = doms[i];
+                        const style = dom.getBoundingClientRect()
+                        array.push({
+                            top: style.top,
+                            left: style.left
+                        })
+                    }
+                    return array
+                }
+                start() {
+                    const next = this.getstyle(this.children)
+                    // console.log("更换前：", this.arr, "更换后：", next);
+                    const distances = this.arr.map((a, index) => {
+                        return {
+                            left: a.left - next[index].left,
+                            top: a.top - next[index].top
+                        }
+                    })
+                    console.log(distances);
+                    this.children.forEach((dom, index) => {
+                        dom.style.transform = `translateX(${distances[index].left}px) translateY(${distances[index].top}px)`;
+                        dom.style.transition = "0s"
+                        requestAnimationFrame(() => {
+                            dom.style.transform = `translateX(0) translateY(0)`;
+                            dom.style.transition = "1s"
+                        })
+                    });
+                    this.arr = next
+                }
+            }
+            // 交换位置
+            function change() {
+                i = 0
+                while (i <= lis.length - 1) {
+                    const node = Container.children[i]
+                    const insert = Container.children[lis.length - 1]
+                    Container.insertBefore(insert, node)
+                    i++
+                }
+                filp.start()
+            }
+            function init() {
+                filp = new Filp(lis)
+                btn.addEventListener("click", change)
+            }
+            init()
+        })()
+    </script>
+</body>
+
+</html>

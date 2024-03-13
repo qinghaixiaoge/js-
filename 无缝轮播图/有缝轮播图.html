@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>有缝轮播图</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .Container {
+            position: relative;
+            width: 100vw;
+            height: 80vh;
+            overflow: hidden;
+        }
+
+        .Container .img-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            position: absolute;
+            left: 0;
+            transition: 1s;
+        }
+
+        .Container .img-container img {
+            width: 100%;
+            height: 100%;
+            flex-shrink: 0;
+            object-fit: cover;
+            display: block;
+        }
+
+        .Container .turn-container div {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+            text-align: center;
+            border-radius: 50%;
+            background-color: #ccc;
+            cursor: pointer;
+        }
+
+        .Container .turn-container .leftBtn {
+            left: 20px;
+        }
+
+        .Container .turn-container .rightBtn {
+            right: 20px;
+        }
+
+        .Container .point-container {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 20px;
+            display: flex;
+        }
+
+        .Container .point-container .point {
+            width: 15px;
+            height: 15px;
+            background-color: #fff;
+            border-radius: 50%;
+            margin: 0 10px;
+            cursor: pointer;
+        }
+
+        .Container .point-container .point.active {
+            background-color: lightcoral;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Container">
+        <div class="img-container">
+            <img src="https://ps.ssl.qhimg.com/dmfd/268_178_80/t01d0334ea7b36823d2.webp" alt="">
+            <img src="https://ps.ssl.qhimg.com/dmfd/268_178_80/t019d99f48ecd7b3d18.webp" alt="">
+            <img src="https://ps.ssl.qhimg.com/dmfd/268_178_80/t010f3921b5a3c0d17c.webp" alt="">
+            <img src="https://ps.ssl.qhimg.com/dmfd/268_178_80/t019e850351ab75216c.webp" alt="">
+        </div>
+        <div class="turn-container">
+            <div class="leftBtn">&lt;</div>
+            <div class="rightBtn">&gt;</div>
+        </div>
+        <div class="point-container">
+            <div class="point active"></div>
+            <div class="point"></div>
+            <div class="point"></div>
+            <div class="point"></div>
+        </div>
+    </div>
+    <script>
+        (function () {
+            const Container = document.querySelector(".Container")
+            const imgcontainer = document.querySelector(".img-container")
+            const num = imgcontainer.children.length
+            let left = imgcontainer.clientWidth
+            const leftBtn = document.querySelector(".leftBtn")
+            const rightBtn = document.querySelector(".rightBtn")
+            const points = document.querySelectorAll(".point")
+            let index = 0
+            let timer = null
+            // 向左移动
+            function toLeft() {
+                index--
+                toGo(index)
+            }
+            // 向右移动
+            function toRight() {
+                index++
+                toGo(index)
+            }
+            // 点击跳转
+            function toGo(i) {
+                settimer()
+                if (i < 0) {
+                    i = num - 1
+                }
+                if (i > num - 1) {
+                    i = 0
+                }
+                document.querySelector(".point.active").classList.remove("active")
+                points[i].classList.add("active")
+                requestAnimationFrame(() => {
+                    imgcontainer.style.left = -left * i + 'px'
+                })
+                index = i
+            }
+             //手动点击清空定时器
+             function settimer() {
+                clearInterval(timer)
+                timer = setInterval(toRight,5000)
+            }
+            // 游览器窗口尺寸更改
+            function onresize(){
+                left = imgcontainer.clientWidth
+                // 偏移尺寸调整
+                imgcontainer.style.left = -left * index + 'px'
+            }
+            function init() {
+                points.forEach((point, index) => {
+                    point.addEventListener("click", function (e) {
+                        toGo(index)
+                    })
+                })
+                leftBtn.addEventListener("click", toLeft)
+                rightBtn.addEventListener("click", toRight)
+                settimer()
+                window.addEventListener('resize',onresize)
+            }
+            init()
+        })()
+    </script>
+</body>
+
+</html>
